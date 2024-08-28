@@ -1,0 +1,17 @@
+**/node_modules/
+**/.vscode/
+**/.idea/
+**/.DS_Store
+**/.env
+**/.env.local
+**/.env.development
+**/.env.production
+**/.env.test
+**/logs/
+*.log
+**/tmp/
+**/temp/
+**/cache/
+**/.cache/
+**/dist/
+**/build/
