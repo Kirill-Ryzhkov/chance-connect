@@ -1,7 +1,8 @@
+import { WholeCafe } from "./components/cafe/WholeCafe";
+
 function App() {
   return (
-    <div className="App">
-    </div>
+    <WholeCafe />
   );
 }
 
