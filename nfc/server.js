@@ -7,42 +7,57 @@ const path = require('path');
 const nfc = new NFC();
 const app = express();
 const server = http.createServer(app);
-// const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ server });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-nfc.on('reader', reader => {
-    // wss.on('connection', (socket) => {
+// Keep track of connected clients
+const clients = new Set();
 
-    //     socket.send('Добро пожаловать NFC!');
-    //     socket.send(`${reader.reader.name}  device attached\n`);
+wss.on('connection', (socket) => {
+    console.log('Client connected');
+    clients.add(socket);
 
-        reader.on('card', card => {
-            console.log(`${reader.reader.name}  card detected\n`, card.uid);
-            // socket.send('cardID:' + card.uid);
-        });
-
-        reader.on('card.off', card => {
-            // socket.send('card - ' + card.uid + ' has removed');
-        });
-
-        reader.on('error', err => {
-            console.log(`${reader.reader.name}  an error occurred\n`, err);
-            // socket.send('You have some errors - ' + err);
-        });
-
-        reader.on('end', () => {
-            console.log(`${reader.reader.name}  device removed\n`);
-            // socket.send('reader device removed. Goodbye!');
-        });
-
-    //     socket.on('close', () => {
-    //         console.log('Client disconnected');
-    //     });
-    // });
+    socket.on('close', () => {
+        console.log('Client disconnected');
+        clients.delete(socket);
+    });
 });
 
+nfc.on('reader', reader => {
+    console.log(`${reader.reader.name} device attached`);
 
+    reader.on('card', card => {
+        console.log(`${reader.reader.name} card detected`, card.uid);
+        for (const client of clients) {
+            client.send('cardID:' + card.uid);
+        }
+    });
+
+    reader.on('card.off', card => {
+        for (const client of clients) {
+            client.send('card - ' + card.uid + ' has removed');
+        }
+    });
+
+    reader.on('error', err => {
+        console.error(`${reader.reader.name} an error occurred`, err);
+        for (const client of clients) {
+            client.send('You have some errors - ' + err);
+        }
+    });
+
+    reader.on('end', () => {
+        console.log(`${reader.reader.name} device removed`);
+        for (const client of clients) {
+            client.send('reader device removed. Goodbye!');
+        }
+    });
+});
+
+nfc.on('error', err => {
+    console.error('NFC error', err);
+});
 
 const PORT = process.env.PORT || 2000;
 server.listen(PORT, () => {
