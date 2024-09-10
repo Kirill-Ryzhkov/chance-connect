@@ -66,7 +66,7 @@ const getTokenByNFC = async(req, res) => {
             return;
         }
         const authToken = createToken(user._id);
-        res.status(200).json({ email: user.email, authToken });
+        res.status(200).json({ user, authToken });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
