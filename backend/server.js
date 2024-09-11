@@ -4,6 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const eventRoutes = require("./routes/event");
 const userRoutes = require("./routes/user");
+const orderRoutes = require("./routes/order");
 
 const app = express();
 
@@ -11,9 +12,9 @@ const app = express();
 app.use(express.json());
 
 // routes
-
 app.use("/api/event", eventRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/order", orderRoutes);
 
 // trying to connect to db & starting server
 mongoose.connect(process.env.MONGODB)
