@@ -1,6 +1,6 @@
 import React from "react";
 
-export const SummaryOrder = ({ drinkType, selectedDrink, syrup = "", addOn = "", handleBack}) => {
+export const SummaryOrder = ({ drinkType, selectedDrink, syrup = "", addOn = "", handleBack, handleFinish}) => {
     return (
         <>
             <h2>Your order</h2>
@@ -14,7 +14,7 @@ export const SummaryOrder = ({ drinkType, selectedDrink, syrup = "", addOn = "",
             )}
             <div className="buttons-container">
                 <button className="back-last-button" onClick={handleBack}>Back</button>
-                <button className="finish-button">Order</button>
+                <button className="finish-button" onClick={handleFinish}>Order</button>
             </div>
         </>
     )

@@ -69,7 +69,11 @@ export const WholeCafe = () => {
             <div className="body">
                 { !auth ? (
                     !tappedCard ? <Arrow /> : <Loader />
-                ) : <CafeMenu user={user}/>}
+                ) : <CafeMenu 
+                        user={user}
+                        updateBalance={setUser} 
+                        auth={auth}
+                    />}
             </div>
         </div>
     );

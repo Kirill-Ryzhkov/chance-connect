@@ -2,14 +2,19 @@ import React, { useState } from "react";
 import '../../assets/css/cafe.css';
 import { SummaryOrder } from "./SummaryOrder";
 import { CafeGrid } from "./CafeGrid";
+import { FinalOrder } from "./FinalOrder";
 import { coffeeOrTea, coffeeList, teaList, syrupList, addOnList } from "../../assets/cafeList";
 
-const CafeMenu = ({ user }) =>  {
+const API_URI = process.env.REACT_APP_BACKEND_API_URI;
+
+const CafeMenu = ({ user, updateBalance, auth }) =>  {
     const [step, setStep] = useState(1);
     const [drinkType, setDrinkType] = useState('');
     const [selectedDrink, setSelectedDrink] = useState('');
     const [syrup, setSyrup] = useState('');
     const [addOn, setAddOn] = useState('');
+    const [order, setOrder] = useState('');
+    const [updatedBalance, setUpdatedBalance] = useState(false);
 
     const handleDrinkType = (type) => {
         setDrinkType(type);
@@ -35,6 +40,46 @@ const CafeMenu = ({ user }) =>  {
         setStep(step - 1);
     };
 
+    const changeBalance = () => {
+        const updatedUser = {
+            ...user,
+            balance: user.balance - 500
+        };
+        updateBalance(updatedUser);
+        setUpdatedBalance(true);
+    }
+
+    const handleFinish = () => {
+        setStep(step + 1);
+        const url = `${API_URI}/order`;
+        const header = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + auth
+        };
+
+        let orderName;
+        if (drinkType === 'tea') {
+            orderName = `${drinkType}, ${selectedDrink}`;
+        } else {
+            orderName = `${drinkType}, ${selectedDrink}, ${syrup}, ${addOn}`;
+        }
+
+        const body = {
+            name: orderName
+        };
+
+        fetch(url, {
+            method: "POST",
+            headers: header,
+            body: JSON.stringify(body)
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setOrder(data.newOrder);
+            })
+            .catch((error) => console.error("Error:", error));
+    }
+
     return (
         <div className="menu-container">
             {step === 1 && 
@@ -56,9 +101,10 @@ const CafeMenu = ({ user }) =>  {
 
             {step === 3 && drinkType === 'tea' &&
                 <SummaryOrder
-                    drinkType={drinkType} 
-                    selectedDrink={selectedDrink} 
-                    handleBack={handleBack} 
+                    drinkType={drinkType}
+                    selectedDrink={selectedDrink}
+                    handleBack={handleBack}
+                    handleFinish={handleFinish}
                 />
             }
 
@@ -86,7 +132,15 @@ const CafeMenu = ({ user }) =>  {
                     selectedDrink={selectedDrink}
                     syrup={syrup}
                     addOn={addOn}
-                    handleBack={handleBack} 
+                    handleBack={handleBack}
+                    handleFinish={handleFinish}
+                />
+            }
+
+            {(step === 6 || (step === 4 && drinkType == 'tea')) &&
+                <FinalOrder
+                    order={order}
+                    balance={changeBalance}
                 />
             }
 
