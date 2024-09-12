@@ -41,9 +41,15 @@ const CafeMenu = ({ user, updateBalance, auth }) =>  {
     };
 
     const changeBalance = () => {
+        let newBalance;
+        if (user.balance <= 500) {
+            newBalance = 0;
+        } else {
+            newBalance = user.balance - 500;
+        }
         const updatedUser = {
             ...user,
-            balance: user.balance - 500
+            balance: newBalance
         };
         updateBalance(updatedUser);
         setUpdatedBalance(true);
