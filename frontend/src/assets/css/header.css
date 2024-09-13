@@ -1,7 +1,7 @@
 .header {
     display: flex;
     justify-content: space-between; /* Лого слева, текст справа */
-    align-items: center; /* Выравнивание по вертикали */
+    align-items: flex-start; /* Выравнивание по вертикали */
     position: relative;
     width: 100vw; /* Ширина контейнера на всю ширину экрана */
     padding: 0 20px; /* Отступы внутри контейнера */

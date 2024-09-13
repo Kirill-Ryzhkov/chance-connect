@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import '../../assets/css/cafe.css';
 import { SummaryOrder } from "./SummaryOrder";
 import { CafeGrid } from "./CafeGrid";
-import { FinalOrder } from "./FinalOrder";
+import { FinalScreen } from "./FinalScreen";
+import { Payment } from "./payment/Payment";
 import { coffeeOrTea, coffeeList, teaList, syrupList, addOnList } from "../../assets/cafeList";
 
 const API_URI = process.env.REACT_APP_BACKEND_API_URI;
@@ -15,6 +17,8 @@ const CafeMenu = ({ user, updateBalance, auth }) =>  {
     const [addOn, setAddOn] = useState('');
     const [order, setOrder] = useState('');
     const [updatedBalance, setUpdatedBalance] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleDrinkType = (type) => {
         setDrinkType(type);
@@ -81,7 +85,11 @@ const CafeMenu = ({ user, updateBalance, auth }) =>  {
         })
             .then((response) => response.json())
             .then((data) => {
-                setOrder(data.newOrder);
+                setOrder(data.result);
+
+                navigate("/done", {
+                    state: { order: data }
+                });
             })
             .catch((error) => console.error("Error:", error));
     }
@@ -142,14 +150,6 @@ const CafeMenu = ({ user, updateBalance, auth }) =>  {
                     handleFinish={handleFinish}
                 />
             }
-
-            {(step === 6 || (step === 4 && drinkType == 'tea')) &&
-                <FinalOrder
-                    order={order}
-                    balance={changeBalance}
-                />
-            }
-
 
         </div>
     )
