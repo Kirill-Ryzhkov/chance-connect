@@ -3,6 +3,7 @@ import { useLocation, useSearchParams } from "react-router-dom";
 import Header from "../header/Header";
 import { ShowNumber } from "./ShowNumber";
 import { Payment } from "./payment/Payment";
+import { HomeRedirect } from "./HomeRedirect";
 import "../../assets/css/body.css";
 
 const API_URI = process.env.REACT_APP_BACKEND_API_URI;
@@ -59,7 +60,10 @@ export const FinalScreen = () => {
             <div className="body">
             {
                 error ? (
-                    <h2 className="error-message">{error}</h2>
+                    <>
+                        <h2 className="error-message">{error}</h2>
+                        <HomeRedirect />
+                    </>
                 ) : (
                     newOrder ? (
                         <ShowNumber number={newOrder.id_number} />
