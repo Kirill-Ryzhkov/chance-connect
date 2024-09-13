@@ -20,12 +20,19 @@ const orderSchema = new Schema({
     },
     complete: {
         type: Boolean,
+    },
+    intent_id: {
+        type: String,
+    },
+    paid: {
+        type: Boolean,
+        required: true
     }
 }, {
     timestamps: true
 });
 
-orderSchema.statics.createOrder = async function (name, user_id) {
+orderSchema.statics.createOrder = async function (name, user_id, paid, intent_id = "") {
     if (name === '') {
         throw Error ("Order's name needed"); 
     }
@@ -34,7 +41,9 @@ orderSchema.statics.createOrder = async function (name, user_id) {
         id_number: generateOrderNumber(),
         name,
         user_id,
-        complete: false
+        complete: false,
+        intent_id,
+        paid,
     });
 }
 
