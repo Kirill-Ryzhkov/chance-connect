@@ -59,7 +59,7 @@
     margin-top: 20px;
   }
 
-  .back-last-button, .finish-button {
+  .back-last-button, .finish-button, .payment-button {
     padding: 10px 20px;
     font-size: 18px;
     background-color: #007bff;
@@ -70,6 +70,10 @@
     transition: background-color 0.3s ease;
   }
 
-  .back-button:hover, .back-last-button:hover, .finish-button:hover {
+  .payment-button {
+    margin-top: 20px;
+  }
+
+  .back-button:hover, .back-last-button:hover, .finish-button:hover, .payment-button:hover {
     background-color: #0056b3;
   }
