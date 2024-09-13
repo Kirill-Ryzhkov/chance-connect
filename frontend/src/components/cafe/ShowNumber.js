@@ -1,9 +1,12 @@
-import React from "react";
-import Header from "../header/Header";
+import React, { useEffect } from "react";
+import { HomeRedirect } from "./HomeRedirect";
+
 
 export const ShowNumber = ({ number }) => {
-    
-    return (  
-        <h1>Number of your order is {number}</h1>
+    return (
+        <>
+            <h1>Number of your order is {number}</h1>
+            <HomeRedirect />
+        </>
     );
 }
