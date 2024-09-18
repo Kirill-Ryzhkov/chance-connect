@@ -13,7 +13,6 @@ const isAdminRole = require("../middleware/isAdminRole");
 
 const router = express.Router();
 
-// middleware
 router.use(corsHeader);
 
 // sign up

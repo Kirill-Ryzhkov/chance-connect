@@ -28,7 +28,20 @@ const toggleCafeEvent = async (req, res) => {
     }
 }
 
+const statusCafe = async (req, res) => {
+    const name = req.params.name;
+     
+    try {
+        const event = await Event.findOne({name});
+        
+        res.status(200).json({status: event});
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+}
+
 module.exports = {
     createEvent,
-    toggleCafeEvent
+    toggleCafeEvent,
+    statusCafe
 }

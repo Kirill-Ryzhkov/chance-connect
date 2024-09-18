@@ -16,23 +16,46 @@ const createOrder = async (req, res) => {
         if (user.balance >= 500) {
             newOrder = await Order.createOrder(name, req.user._id, true);
             user.balance -= 500;
-            user.save();
             type = "order";
         } else {
+            const newBalance = Math.abs(user.balance - 500);
+            user.balance = 0;
             newOrder = await stripe.paymentIntents.create({
-                amount: 500,
+                amount: newBalance,
                 currency: 'usd',
                 payment_method_types: ['cashapp']
             });
-            console.log(await Order.createOrder(name, req.user._id, false, newOrder.id));
+            await Order.createOrder(name, req.user._id, false, newOrder.id);
             type = "payment";
         }
+        await user.save();
         res.status(200).json({
             type,
             result: newOrder
         });
     } catch (error) {
         res.status(401).json({error: error.message});
+    }
+}
+
+const getOrders = async (req, res) => {
+    try {
+        const orders = await Order.find({paid: true}, {_id: 1, id_number: 1, name: 1, complete: 1, updatedAt: 1}).sort({updatedAt: 1});
+        res.status(200).json({ orders })
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+}
+
+const completeOrder = async (req, res) => {
+    const { order_id } = req.body;
+
+    try {
+        await Order.findOneAndUpdate({_id: order_id}, {complete: true});
+        const orders = await Order.find({paid: true}, {_id: 1, id_number: 1, name: 1, complete: 1, updatedAt: 1}).sort({updatedAt: 1});
+        res.status(200).json({ orders });
+    } catch (error) {
+        res.status(400).json({error: error.message});
     }
 }
 
@@ -59,5 +82,7 @@ const paymentOrder = async (req, res) => {
 
 module.exports = {
     createOrder,
+    getOrders,
+    completeOrder,
     paymentOrder
 };
