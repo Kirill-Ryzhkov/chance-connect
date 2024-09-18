@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import '../../assets/css/cafe.css';
 import { SummaryOrder } from "./SummaryOrder";
 import { CafeGrid } from "./CafeGrid";
-import { FinalScreen } from "./FinalScreen";
-import { Payment } from "./payment/Payment";
+import { RedirectButton } from "./RedirectButton";
 import { coffeeOrTea, coffeeList, teaList, syrupList, addOnList } from "../../assets/cafeList";
 
 const API_URI = process.env.REACT_APP_BACKEND_API_URI;
@@ -95,63 +94,67 @@ const CafeMenu = ({ user, updateBalance, auth }) =>  {
     }
 
     return (
-        <div className="menu-container">
-            {step === 1 && 
-                <CafeGrid
-                    options={coffeeOrTea}
-                    onTileClick={handleDrinkType}
-                    title="Choose the type of your drink"
-                />
-            }
+        <>
+            <div className="menu-container">
+                {step === 1 && 
+                    <CafeGrid
+                        options={coffeeOrTea}
+                        onTileClick={handleDrinkType}
+                        title="Choose the type of your drink"
+                    />
+                }
 
-            {step === 2 &&
-                <CafeGrid
-                    options={(drinkType === 'coffee' ? coffeeList : teaList)}
-                    onTileClick={handleDrinkSelect}
-                    title={"Choose the " + drinkType}
-                    handleBack={handleBack}
-                /> 
-            }
+                {step === 2 &&
+                    <CafeGrid
+                        options={(drinkType === 'coffee' ? coffeeList : teaList)}
+                        onTileClick={handleDrinkSelect}
+                        title={"Choose the " + drinkType}
+                        handleBack={handleBack}
+                    /> 
+                }
 
-            {step === 3 && drinkType === 'tea' &&
-                <SummaryOrder
-                    drinkType={drinkType}
-                    selectedDrink={selectedDrink}
-                    handleBack={handleBack}
-                    handleFinish={handleFinish}
-                />
-            }
+                {step === 3 && drinkType === 'tea' &&
+                    <SummaryOrder
+                        drinkType={drinkType}
+                        selectedDrink={selectedDrink}
+                        handleBack={handleBack}
+                        handleFinish={handleFinish}
+                    />
+                }
 
-            {step === 3 && drinkType === 'coffee' &&
-                <CafeGrid
-                    options={syrupList}
-                    onTileClick={handleSyrup}
-                    title="Choose the syrup"
-                    handleBack={handleBack}
-                />
-            }
+                {step === 3 && drinkType === 'coffee' &&
+                    <CafeGrid
+                        options={syrupList}
+                        onTileClick={handleSyrup}
+                        title="Choose the syrup"
+                        handleBack={handleBack}
+                    />
+                }
 
-            {step === 4 && drinkType === 'coffee' &&
-                <CafeGrid
-                    options={addOnList}
-                    onTileClick={handleAddOn}
-                    title="Choose the add-on"
-                    handleBack={handleBack}
-                />
-            }
+                {step === 4 && drinkType === 'coffee' &&
+                    <CafeGrid
+                        options={addOnList}
+                        onTileClick={handleAddOn}
+                        title="Choose the add-on"
+                        handleBack={handleBack}
+                    />
+                }
 
-            {step === 5 &&
-                <SummaryOrder 
-                    drinkType={drinkType} 
-                    selectedDrink={selectedDrink}
-                    syrup={syrup}
-                    addOn={addOn}
-                    handleBack={handleBack}
-                    handleFinish={handleFinish}
-                />
-            }
-
-        </div>
+                {step === 5 &&
+                    <SummaryOrder 
+                        drinkType={drinkType} 
+                        selectedDrink={selectedDrink}
+                        syrup={syrup}
+                        addOn={addOn}
+                        handleBack={handleBack}
+                        handleFinish={handleFinish}
+                    />
+                }
+            </div>
+            <div className="redirect-container">
+                <RedirectButton text={"Go Home"} />
+            </div>
+        </>
     )
 }
 

@@ -40,6 +40,13 @@
     font-weight: bold;
   }
 
+  .redirect-container {
+    position: absolute;
+    bottom: 40px;
+    left: 80px;
+    z-index: 100; /* Ensure it's on top if needed */
+  }
+
   .back-button {
     margin-top: 20px;
     padding: 10px 20px;
