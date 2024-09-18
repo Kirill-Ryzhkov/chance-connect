@@ -5,12 +5,14 @@ import Loader from "./Loader";
 import CafeMenu from "./CafeMenu";
 
 const API_URI = process.env.REACT_APP_BACKEND_API_URI;
+const EVENT_NAME = process.env.REACT_APP_EVENT_NAME;
 
 export const WholeCafe = () => {
 
     const [tappedCard, setTappedCard] = useState(false);
     const [auth, setAuth] = useState(null);
     const [user, setUser] = useState("");
+    const [isOpenCafe, setIsOpenCafe] = useState();
 
     useEffect(() => {
         const socket = new WebSocket("ws://localhost:2000")
@@ -61,12 +63,51 @@ export const WholeCafe = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const url = `${API_URI}/event/statusCafe/${EVENT_NAME}`;
+        const header = {
+            "Content-Type": "application/json"
+        }
+
+        fetch(url, {
+            method: "GET",
+            headers: header
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setIsOpenCafe(data.status.open);
+            })
+            .catch((error) => console.error("Error:", error));
+        
+    }, []);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            const url = `${API_URI}/event/statusCafe/${EVENT_NAME}`;
+            const header = {
+                "Content-Type": "application/json"
+            }
+
+            fetch(url, {
+                method: "GET",
+                headers: header
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    setIsOpenCafe(data.status.open);
+                })
+                .catch((error) => console.error("Error:", error));
+        }, 10000);
+
+        return () => clearInterval(intervalId);
+    }, [auth]);
+
     return (
         <div className="App">
             <div className="header">
                 <Header userData={user} />
             </div>
-            <div className="body">
+            {isOpenCafe ? <div className="body">
                 { !auth ? (
                     !tappedCard ? <Arrow /> : <Loader />
                 ) : <CafeMenu 
@@ -74,7 +115,7 @@ export const WholeCafe = () => {
                         updateBalance={setUser} 
                         auth={auth}
                     />}
-            </div>
+            </div> : <h1>Cafe is closed</h1> }
         </div>
     );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../assets/css/body.css";
+import { RedirectButton } from "./RedirectButton";
 
 export const HomeRedirect = () => {
     const navigate = useNavigate();
@@ -14,6 +15,6 @@ export const HomeRedirect = () => {
     }, []);
     
     return (
-        <button className="home-button" onClick={() => navigate("/cafe")}>Go Home</button>
+        <RedirectButton text={"Go Home"} />
     );
 }

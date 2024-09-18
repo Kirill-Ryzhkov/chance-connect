@@ -6,14 +6,102 @@
     text-align: center;
 }
 
-.home-button {
+.redirect-button {
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 18px;
-    background-color: #007bff;
+    background-color: #007bff !important;
     color: white;
-    border: none;
+    border: none !important;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
+.orders-table {
+    width: 100%;
+}
+
+.table-container {
+    margin: 20px auto;
+    width: 80%;
+    text-align: center;
+  }
+  
+  .header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 20px;
+  }
+  
+  .redirect-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .tabs {
+    display: flex;
+    justify-content: center; /* Центрирует вкладки "Orders" и "History" */
+  }
+  
+  .tabs button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .tabs button.active {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+  }
+  
+  .tab-content {
+    color: #333;
+    margin-top: 20px;
+  }
+  
+  .styled-table {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: white;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+  }
+  
+  .styled-table th, .styled-table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+  }
+  
+  .styled-table th {
+    background-color: #f0f0f0;
+    color: #333;
+    text-transform: uppercase;
+  }
+  
+  .styled-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .styled-table tr:hover {
+    background-color: #ddd;
+  }
+  
+  .styled-table button {
+    padding: 6px 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .styled-table button:hover {
+    background-color: #218838;
+  }
