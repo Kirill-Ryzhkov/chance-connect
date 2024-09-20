@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import '../../assets/css/cafe.css';
 import { SummaryOrder } from "./SummaryOrder";
 import { CafeGrid } from "./CafeGrid";
-import { RedirectButton } from "./RedirectButton";
+import RedirectButton from "../common/RedirectButton";
 import { coffeeOrTea, coffeeList, teaList, syrupList, addOnList } from "../../assets/cafeList";
 
 const API_URI = process.env.REACT_APP_BACKEND_API_URI;
@@ -151,8 +150,11 @@ const CafeMenu = ({ user, updateBalance, auth }) =>  {
                     />
                 }
             </div>
-            <div className="redirect-container">
-                <RedirectButton text={"Go Home"} />
+            <div className="absolute bottom-10 left-20 z-50">
+                <RedirectButton 
+                    text={"Go Home"}
+                    url={'/'}
+                />
             </div>
         </>
     )

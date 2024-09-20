@@ -5,7 +5,7 @@ const Arrow = () => {
   return (
     <div className="arrow-container">
       <div className="content">
-        <div className="tap-card">
+        <div className="tap-card md:text-3xl sm:text-2xl">
           Tap your card
         </div>
         <div className="arrow">

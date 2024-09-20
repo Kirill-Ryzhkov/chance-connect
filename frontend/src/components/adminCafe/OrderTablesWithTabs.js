@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-
+import Button from "../common/Button";
+import "../../assets/css/body.css";
 
 export const OrderTablesWithTabs = ({ orders, updateOrders, completeOrder, statusCafe, toggleCafe, auth }) => {
   const [activeTab, setActiveTab] = useState(0);
@@ -13,21 +14,24 @@ export const OrderTablesWithTabs = ({ orders, updateOrders, completeOrder, statu
 
   return (
     <div className="table-container">
-      <h2>Order Tables</h2>
+      <h2 className="text-2xl">Order Tables</h2>
       
       <div className="header">
         <div>
-          <button className="redirect-button" onClick={toggleCafe}>{ statusCafe ? 'Close Cafe' : 'Open Cafe' }</button>
+          <Button
+            handleClick={toggleCafe}
+            text={statusCafe ? 'Close Cafe' : 'Open Cafe'}
+          />
         </div>
         <div className="tabs">
           <button
-            className={activeTab === 0 ? 'active' : ''}
+            className={activeTab === 0 ? 'active' : 'text-black'}
             onClick={() => handleTabClick(0)}
           >
             Orders
           </button>
           <button
-            className={activeTab === 1 ? 'active' : ''}
+            className={activeTab === 1 ? 'active' : 'text-black'}
             onClick={() => handleTabClick(1)}
           >
             History

@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../assets/css/body.css";
-import { RedirectButton } from "./RedirectButton";
+import RedirectButton from "../common/RedirectButton";
 
 export const HomeRedirect = () => {
     const navigate = useNavigate();
@@ -15,6 +14,9 @@ export const HomeRedirect = () => {
     }, []);
     
     return (
-        <RedirectButton text={"Go Home"} />
+        <RedirectButton
+            text={"Go Home"}
+            url={'/'}
+        />
     );
 }
