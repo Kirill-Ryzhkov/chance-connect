@@ -12,7 +12,7 @@ export const WholeCafe = () => {
     const [tappedCard, setTappedCard] = useState(false);
     const [auth, setAuth] = useState(null);
     const [user, setUser] = useState("");
-    const [isOpenCafe, setIsOpenCafe] = useState();
+    const [isOpenCafe, setIsOpenCafe] = useState(true);
 
     useEffect(() => {
         const socket = new WebSocket("ws://localhost:2000")
@@ -64,58 +64,49 @@ export const WholeCafe = () => {
     }, []);
 
     useEffect(() => {
-        const url = `${API_URI}/event/statusCafe/${EVENT_NAME}`;
-        const header = {
-            "Content-Type": "application/json"
-        }
-
-        fetch(url, {
-            method: "GET",
-            headers: header
-        })
+        const fetchCafeStatus = () => {
+            const url = `${API_URI}/event/statusCafe/${EVENT_NAME}`;
+            const header = {
+                "Content-Type": "application/json"
+            };
+    
+            fetch(url, {
+                method: "GET",
+                headers: header
+            })
             .then((response) => response.json())
             .then((data) => {
                 setIsOpenCafe(data.status.open);
             })
             .catch((error) => console.error("Error:", error));
-        
-    }, []);
-
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            const url = `${API_URI}/event/statusCafe/${EVENT_NAME}`;
-            const header = {
-                "Content-Type": "application/json"
-            }
-
-            fetch(url, {
-                method: "GET",
-                headers: header
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    setIsOpenCafe(data.status.open);
-                })
-                .catch((error) => console.error("Error:", error));
-        }, 10000);
-
+        };
+        fetchCafeStatus();
+        const intervalId = setInterval(fetchCafeStatus, 10000);
+    
         return () => clearInterval(intervalId);
-    }, [auth]);
+    }, []);
 
     return (
         <div className="App">
-            <div className="header">
-                <Header userData={user} />
+            <div className="header 2xl:container h-16">
+                <div className="h-full">
+                    <Header userData={user} />
+                </div>
             </div>
-            {isOpenCafe ? <div className="body">
-                { !auth ? (
-                    !tappedCard ? <Arrow /> : <Loader />
-                ) : <CafeMenu 
-                        user={user}
-                        updateBalance={setUser} 
-                        auth={auth}
-                    />}
-            </div> : <h1>Cafe is closed</h1> }
+            
+            {isOpenCafe ? 
+                <div className="body 2xl:container h-[32rem]">
+                    <div className="h-full content-center items-center">
+                        { !auth ? (
+                            !tappedCard ? <Arrow /> : <Loader />
+                        ) : <CafeMenu 
+                                user={user}
+                                updateBalance={setUser} 
+                                auth={auth}
+                            />}
+                    </div>
+                </div> 
+                : <h1 className="2xl:container md:text-4xl sm:text-2xl mt-20 text-center">Cafe is closed</h1> }
         </div>
     );
 }

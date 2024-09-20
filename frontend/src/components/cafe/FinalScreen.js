@@ -4,7 +4,7 @@ import Header from "../header/Header";
 import { ShowNumber } from "./ShowNumber";
 import { Payment } from "./payment/Payment";
 import { HomeRedirect } from "./HomeRedirect";
-import "../../assets/css/body.css";
+// import "../../assets/css/body.css";
 
 const API_URI = process.env.REACT_APP_BACKEND_API_URI;
 
@@ -57,11 +57,11 @@ export const FinalScreen = () => {
             <div className="header">
                 <Header />
             </div>
-            <div className="body">
+            <div className="mt-20 flex flex-col justify-center items-center align-center">
             {
                 error ? (
                     <>
-                        <h2 className="error-message">{error}</h2>
+                        <h2 className="text-2xl">{error}</h2>
                         <HomeRedirect />
                     </>
                 ) : (

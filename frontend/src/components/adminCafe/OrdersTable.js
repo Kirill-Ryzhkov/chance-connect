@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useCookies } from 'react-cookie';
 import Header from "../header/Header";
 import { OrderTablesWithTabs } from "./OrderTablesWithTabs";
-import "../../assets/css/body.css";
+import Button from "../common/Button";
 
 const API_URI = process.env.REACT_APP_BACKEND_API_URI;
 const ADMIN_LOGIN = process.env.REACT_APP_ADMIN_USER_LOGIN;
@@ -16,138 +16,84 @@ export const OrdersTable = () => {
     const [cookie, setCookie] = useCookies(['authToken']);
     const [isOpenCafe, setIsOpenCafe] = useState();
 
+    const fetchData = useCallback(async (url, method = "GET", token = "", body = null) => {
+        const headers = {
+            "Content-Type": "application/json",
+            ...(token && { "Authorization": `Bearer ${token}` })
+        };
+
+        const options = { method, headers };
+        if (body) options.body = JSON.stringify(body);
+
+        const response = await fetch(url, options);
+        return response.json();
+    }, []);
+
+
     useEffect(() => {
-        if(cookie.authToken !== undefined) {
+        if (cookie.authToken) {
             setAuth(cookie.authToken);
             orderList(cookie.authToken);
         }
     }, [cookie.authToken]);
 
     useEffect(() => {
-        let intervalId;
+        if (!auth) return;
 
-        if (auth) {
-            intervalId = setInterval(() => {
-                orderList(auth);
-            }, 10000);
-        }
+        const intervalId = setInterval(() => {
+            orderList(auth);
+        }, 10000);
 
         return () => clearInterval(intervalId);
     }, [auth]);
 
     useEffect(() => {
-        const url = `${API_URI}/event/statusCafe/${EVENT_NAME}`;
-        const header = {
-            "Content-Type": "application/json"
-        }
+        fetchData(`${API_URI}/event/statusCafe/${EVENT_NAME}`)
+            .then(data => setIsOpenCafe(data.status.open))
+            .catch(console.error);
+    }, [fetchData]);
 
-        fetch(url, {
-            method: "GET",
-            headers: header
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                setIsOpenCafe(data.status.open);
-            })
-            .catch((error) => console.error("Error:", error));
-        
-    }, []);
+    const orderList = useCallback((token) => {
+        fetchData(`${API_URI}/order`, "GET", token)
+            .then(data => setOrders(data.orders))
+            .catch(console.error);
+    }, [fetchData]);
 
-    const handlePrompt = () => {
-        const password = window.prompt('Please enter the password:', '');
-        if (password == ADMIN_PASSWORD) {
-            authorize();
-        } else if(password === null) {}
-        else {
-            handlePrompt();
-        }
-    };
+    const handleClose = useCallback(() => {
+        fetchData(`${API_URI}/event/toggleCafe/${EVENT_NAME}`, "GET", auth)
+            .then(() => setIsOpenCafe(!isOpenCafe))
+            .catch(console.error);
+    }, [auth, isOpenCafe, fetchData]);
 
-    const authorize = () => {
-        if(!auth) {
-            const url = `${API_URI}/user/signin`;
-            const header = {
-                "Content-Type": "application/json"
-            };
-            const body = {
+    const handleComplete = useCallback((id) => {
+        fetchData(`${API_URI}/order/complete`, "POST", auth, { order_id: id })
+            .then(data => setOrders(data.orders))
+            .catch(console.error);
+    }, [auth, fetchData]);
+
+    const authorize = useCallback(() => {
+        if (!auth) {
+            fetchData(`${API_URI}/user/signin`, "POST", "", {
                 email: ADMIN_LOGIN,
                 password: ADMIN_PASSWORD
-            }
-            
-            fetch(url, {
-                method: "POST",
-                headers: header,
-                body: JSON.stringify(body)
             })
-                .then((response) => response.json())
-                .then((data) => {
-                    setCookie('authToken', data.token, { path: '/', expires: new Date(Date.now() + 3600000) });
-                    setAuth(data.token);
-                    orderList(data.token);
-                })
-                .catch((error) => console.error("Error:", error));
-
-            
+            .then(data => {
+                setCookie('authToken', data.token, { path: '/', expires: new Date(Date.now() + 3600000) });
+                setAuth(data.token);
+                orderList(data.token);
+            })
+            .catch(console.error);
         }
-    }
+    }, [auth, fetchData, setCookie]);
 
-    const orderList = (token) => {
-        const url = `${API_URI}/order`;
-        const header = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-        };
-        
-        fetch(url, {
-            method: "GET",
-            headers: header
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                setOrders(data.orders);
-            })
-            .catch((error) => console.error("Error:", error));
-    }
-
-    const handleClose = () => {
-        const url = `${API_URI}/event/toggleCafe/${EVENT_NAME}`;
-        const header = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + auth
-        };
-    
-        fetch(url, {
-            method: "GET",
-            headers: header,
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                setIsOpenCafe(!isOpenCafe);
-            })
-            .catch((error) => console.error("Error:", error));
-    }
-
-    const handleComplete = (id) => {
-        const url = `${API_URI}/order/complete`;
-        const header = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + auth
-        };
-        const body = {
-            order_id: id
-        };
-    
-        fetch(url, {
-            method: "POST",
-            headers: header,
-            body: JSON.stringify(body)
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                setOrders(data.orders);
-            })
-            .catch((error) => console.error("Error:", error));
-      }
+    const handlePrompt = useCallback(() => {
+        const password = window.prompt('Please enter the password:', '');
+        if (password === ADMIN_PASSWORD) {
+            authorize();
+        } else if (password !== null) {
+            handlePrompt();
+        }
+    }, [authorize]);
     
 
     return (
@@ -157,7 +103,12 @@ export const OrdersTable = () => {
             </div>
             <div className="orders-table">
                 {!auth 
-                    ? <button className="redirect-button" onClick={handlePrompt}>Get Orders</button>
+                    ? 
+                    <div className="w-full text-center">
+                        <Button 
+                            handleClick={handlePrompt}
+                            text={"Get Orders"} />
+                    </div>
                     : <OrderTablesWithTabs
                         orders={orders}
                         updateOrders={setOrders}

@@ -1,5 +1,5 @@
 import {useStripe, useElements, PaymentElement} from '@stripe/react-stripe-js';
-import '../../../assets/css/cafe.css';
+// import '../../../assets/css/cafe.css';
 
 export const CheckoutForm = () => {
   const stripe = useStripe();
@@ -26,9 +26,9 @@ export const CheckoutForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className='items-center text-center'>
       <PaymentElement />
-      <button className='payment-button' disabled={!stripe}>Submit</button>
+      <button className='mt-5 mx-2 py-3 px-5 text-lg bg-sky-600 hover:bg-sky-700 border-none rounded pointer transition-colors' disabled={!stripe}>Submit</button>
     </form>
   )
 };
