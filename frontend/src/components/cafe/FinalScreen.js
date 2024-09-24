@@ -4,6 +4,7 @@ import Header from "../header/Header";
 import { ShowNumber } from "./ShowNumber";
 import { Payment } from "./payment/Payment";
 import { HomeRedirect } from "./HomeRedirect";
+// import "../../assets/css/body.css";
 
 const API_URI = process.env.REACT_APP_BACKEND_API_URI;
 
@@ -60,7 +61,7 @@ export const FinalScreen = () => {
             {
                 error ? (
                     <>
-                        <h2 className="text-4xl">{error}</h2>
+                        <h2 className="text-2xl">{error}</h2>
                         <HomeRedirect />
                     </>
                 ) : (
