@@ -1,6 +1,7 @@
 const express = require("express");
 const corsHeader = require("../middleware/corsHeaders");
 const requireAuth = require("../middleware/requireAuth");
+const isAdminRole = require("../middleware/isAdminRole");
 
 const { createOrder, getOrders, completeOrder, paymentOrder } = require("../controllers/orderController");
 
@@ -9,11 +10,14 @@ const router = express.Router();
 router.use(corsHeader);
 
 router.post("/payment", paymentOrder);
+router.get("/", getOrders);
 
 router.use(requireAuth);
 
 router.post("/", createOrder);
-router.get("/", getOrders);
+
+router.use(isAdminRole);
+
 router.post("/complete", completeOrder);
 
 module.exports = router;
