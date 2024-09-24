@@ -7,8 +7,8 @@ const Header = ({ userData = "" }) => {
 
     return (
         <div className='md:my-3 sm:my-2 flex w-screen'>
-            <div className='text-left w-1/2' onClick={() => navigate('/')}>
-                <img src={LogoImage} alt='logo' className='md:w-2/5'/>
+            <div className='text-left w-1/2'>
+                <img src={LogoImage} alt='logo' className='md:w-2/5' onClick={() => navigate('/')}/>
             </div>
             {userData.first_name ? (
                 <div className='text-right w-1/2 mr-3'>

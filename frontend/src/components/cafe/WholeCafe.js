@@ -3,6 +3,7 @@ import Header from "../header/Header";
 import Arrow from "./Arrow";
 import Loader from "./Loader";
 import CafeMenu from "./CafeMenu";
+import { HomeRedirect } from "./HomeRedirect";
 
 const API_URI = process.env.REACT_APP_BACKEND_API_URI;
 const EVENT_NAME = process.env.REACT_APP_EVENT_NAME;
@@ -13,6 +14,7 @@ export const WholeCafe = () => {
     const [auth, setAuth] = useState(null);
     const [user, setUser] = useState("");
     const [isOpenCafe, setIsOpenCafe] = useState(true);
+    const [error, setError] = useState(false);
 
     useEffect(() => {
         const socket = new WebSocket("ws://localhost:2000")
@@ -47,8 +49,12 @@ export const WholeCafe = () => {
                     })
                         .then((response) => response.json())
                         .then((data) => {
-                            setAuth(data.authToken);
-                            setUser(data.user);
+                            if(data.error) {
+                                setError(true);
+                            } else {
+                                setAuth(data.authToken);
+                                setUser(data.user);
+                            }
                         })
                         .catch((error) => console.error("Error:", error))
                   }, 1000);
@@ -94,19 +100,27 @@ export const WholeCafe = () => {
                 </div>
             </div>
             
-            {isOpenCafe ? 
-                <div className="body 2xl:container h-[32rem]">
-                    <div className="h-full content-center items-center">
-                        { !auth ? (
-                            !tappedCard ? <Arrow /> : <Loader />
-                        ) : <CafeMenu 
-                                user={user}
-                                updateBalance={setUser} 
-                                auth={auth}
-                            />}
-                    </div>
-                </div> 
-                : <h1 className="2xl:container md:text-4xl sm:text-2xl mt-20 text-center">Cafe is closed</h1> }
+            {!error ? (
+                isOpenCafe ? 
+                    <div className="body 2xl:container h-[32rem]">
+                        <div className="h-full content-center items-center">
+                            { !auth ? (
+                                !tappedCard ? <Arrow /> : <Loader />
+                            ) : <CafeMenu 
+                                    user={user}
+                                    updateBalance={setUser} 
+                                    auth={auth}
+                                />}
+                        </div>
+                    </div> 
+                    : <h1 className="2xl:container md:text-4xl sm:text-2xl mt-20 text-center">Cafe is closed</h1> )
+                    :   <>
+                            <h1 className="2xl:container md:text-4xl sm:text-2xl mt-20 text-center">User not found</h1>
+                            <div className="absolute bottom-10 left-20 z-50">
+                                <HomeRedirect />
+                            </div>
+                        </>
+                    }
         </div>
     );
 }
