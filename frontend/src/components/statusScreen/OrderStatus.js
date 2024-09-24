@@ -38,12 +38,8 @@ export const OrderStatus = () => {
             
                 setIdNumbersNotCompleted(prevNotCompletedIdNumbers => {
 
-                    console.log("newCompletedIdNumbers", newCompletedIdNumbers);
-
                     const commonElements = newCompletedIdNumbers.filter((element) => 
                         prevNotCompletedIdNumbers.includes(element));
-            
-                    console.log("commonElements", commonElements);
 
                     showDialog(commonElements);
             
