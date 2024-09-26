@@ -3,7 +3,7 @@ const corsHeader = require("../middleware/corsHeaders");
 const requireAuth = require("../middleware/requireAuth");
 const isAdminRole = require("../middleware/isAdminRole");
 
-const { createOrder, getOrders, completeOrder, paymentOrder } = require("../controllers/orderController");
+const { createOrder, getOrders, completeOrder, clearHistoryOrders, paymentOrder } = require("../controllers/orderController");
 
 const router = express.Router();
 
@@ -18,6 +18,7 @@ router.post("/", createOrder);
 
 router.use(isAdminRole);
 
+router.post("/clear", clearHistoryOrders);
 router.post("/complete", completeOrder);
 
 module.exports = router;

@@ -4,6 +4,10 @@ const User = require("../models/User");
 
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_TEST_KEY);
 
+const receiveOrdersCommon = async () => {
+    return await Order.find({paid: true}, {_id: 1, id_number: 1, name: 1, complete: 1, updatedAt: 1}).sort({updatedAt: 1});
+}
+
 const createOrder = async (req, res) => {
     const { name } = req.body;
 
@@ -40,7 +44,7 @@ const createOrder = async (req, res) => {
 
 const getOrders = async (req, res) => {
     try {
-        const orders = await Order.find({paid: true}, {_id: 1, id_number: 1, name: 1, complete: 1, updatedAt: 1}).sort({updatedAt: 1});
+        const orders = await receiveOrdersCommon();
         res.status(200).json({ orders })
     } catch (error) {
         res.status(400).json({error: error.message});
@@ -52,7 +56,17 @@ const completeOrder = async (req, res) => {
 
     try {
         await Order.findOneAndUpdate({_id: order_id}, {complete: true});
-        const orders = await Order.find({paid: true}, {_id: 1, id_number: 1, name: 1, complete: 1, updatedAt: 1}).sort({updatedAt: 1});
+        const orders = await receiveOrdersCommon();
+        res.status(200).json({ orders });
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+}
+
+const clearHistoryOrders = async (req, res) => {
+    try {
+        const result = await Order.deleteMany({complete: true});
+        const orders = await receiveOrdersCommon();
         res.status(200).json({ orders });
     } catch (error) {
         res.status(400).json({error: error.message});
@@ -84,5 +98,6 @@ module.exports = {
     createOrder,
     getOrders,
     completeOrder,
+    clearHistoryOrders,
     paymentOrder
 };
