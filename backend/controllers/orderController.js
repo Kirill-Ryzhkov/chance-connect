@@ -1,8 +1,9 @@
 require('dotenv').config();
 const Order = require("../models/Order");
 const User = require("../models/User");
+const sendTelegramMessage = require("../services/sendMessage");
 
-const stripe = require("stripe")(process.env.STRIPE_PRIVATE_TEST_KEY);
+const stripe = require("stripe")(process.env.STRIPE_PRIVATE_LIVE_KEY);
 
 const receiveOrdersCommon = async () => {
     return await Order.find({paid: true}, {_id: 1, id_number: 1, name: 1, complete: 1, updatedAt: 1}).sort({updatedAt: 1});
@@ -21,8 +22,9 @@ const createOrder = async (req, res) => {
             newOrder = await Order.createOrder(name, req.user._id, true);
             user.balance -= 500;
             type = "order";
+            await sendTelegramMessage(`Your order has been created\nNumber of your order is ${newOrder.id_number}`, user.chat_id);
         } else {
-            const newBalance = Math.abs(user.balance - 500);
+            const newBalance = Math.abs(user.balance - 50);
             user.balance = 0;
             newOrder = await stripe.paymentIntents.create({
                 amount: newBalance,
@@ -55,7 +57,9 @@ const completeOrder = async (req, res) => {
     const { order_id } = req.body;
 
     try {
-        await Order.findOneAndUpdate({_id: order_id}, {complete: true});
+        const completeOrder = await Order.findOneAndUpdate({_id: order_id}, {complete: true});
+        const userObj = await User.findById(completeOrder.user_id);
+        await sendTelegramMessage(`Your order ${completeOrder.id_number} complete`, userObj.chat_id);
         const orders = await receiveOrdersCommon();
         res.status(200).json({ orders });
     } catch (error) {
@@ -87,6 +91,8 @@ const paymentOrder = async (req, res) => {
         }
         
         const order = await Order.findOneAndUpdate({ intent_id }, { paid: true });
+        const userObj = await User.findById(order.user_id);
+        await sendTelegramMessage(`Your order has been created\nNumber of your order is ${order.id_number}`, userObj.chat_id);
         res.status(200).json({ result: order, success: true });
 
     } catch (error) {
