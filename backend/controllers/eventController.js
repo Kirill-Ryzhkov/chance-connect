@@ -16,7 +16,7 @@ const toggleCafeEvent = async (req, res) => {
      
     try {
         const event = await Event.findOne({name});
-      
+
         if (event) {
             event.open = !event.open;
             await event.save();

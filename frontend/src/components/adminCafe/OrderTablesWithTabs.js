@@ -6,7 +6,7 @@ export const OrderTablesWithTabs = ({ orders, completeOrder, statusCafe, toggleC
   const [activeTab, setActiveTab] = useState(0);
 
   const orders1 = orders.filter(order => !order.complete);
-  const orders2 = orders.filter(order => order.complete);
+  const orders2 = orders.filter(order => order.complete).reverse();
 
   const handleTabClick = (index) => {
     setActiveTab(index);
