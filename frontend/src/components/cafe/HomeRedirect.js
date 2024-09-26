@@ -7,7 +7,7 @@ export const HomeRedirect = () => {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            navigate("/cafe");
+            navigate("/");
         }, 10000)
 
         return () => clearTimeout(timer);

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from "../common/Button";
 import "../../assets/css/body.css";
 
-export const OrderTablesWithTabs = ({ orders, updateOrders, completeOrder, statusCafe, toggleCafe, auth }) => {
+export const OrderTablesWithTabs = ({ orders, completeOrder, statusCafe, toggleCafe, clearHistory }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const orders1 = orders.filter(order => !order.complete);
@@ -22,6 +22,10 @@ export const OrderTablesWithTabs = ({ orders, updateOrders, completeOrder, statu
             handleClick={toggleCafe}
             text={statusCafe ? 'Close Cafe' : 'Open Cafe'}
           />
+          { activeTab === 1 && <Button
+            handleClick={clearHistory}
+            text={'Clear History'}
+          />}
         </div>
         <div className="tabs">
           <button
