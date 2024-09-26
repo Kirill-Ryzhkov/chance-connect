@@ -1,7 +1,6 @@
 const express = require("express");
 const corsHeader = require("../middleware/corsHeaders");
 const requireAuth = require("../middleware/requireAuth");
-const isAdminRole = require("../middleware/isAdminRole");
 
 const { createOrder, getOrders, completeOrder, clearHistoryOrders, paymentOrder } = require("../controllers/orderController");
 
