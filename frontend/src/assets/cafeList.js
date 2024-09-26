@@ -20,35 +20,55 @@ import ChocolateChips from '../assets/images/chocolateChips.jpeg';
 import Cookies from '../assets/images/cookies.jpg';
 import WhippedCream from '../assets/images/whippedCream.jpg';
 
+export const arrayImages = [
+    Tea,
+    Coffee,
+    Latte,
+    Cappuccino,
+    Espresso,
+    Americano,
+    Green,
+    Black,
+    Premium,
+    Fruit,
+    None,
+    Strawberry,
+    Raspberry,
+    Vanilla,
+    ChocolateChips,
+    Cookies,
+    WhippedCream
+]
+
 export const coffeeOrTea = [
-    { name: 'Tea', imgSrc: Tea },
-    { name: 'Coffee', imgSrc: Coffee }
+    { name: 'Tea', src: Tea },
+    { name: 'Coffee', src: Coffee }
 ]
 
 export const coffeeList = [
-    { name: 'Latte', imgSrc: Latte },
-    { name: 'Cappuccino', imgSrc: Cappuccino },
-    { name: 'Espresso', imgSrc: Espresso },
-    { name: 'Americano', imgSrc: Americano }
+    { name: 'Latte', src: Latte },
+    { name: 'Cappuccino', src: Cappuccino },
+    { name: 'Espresso', src: Espresso },
+    { name: 'Americano', src: Americano }
 ];
 
 export const teaList = [
-    { name: 'Green', imgSrc: Green },
-    { name: 'Black', imgSrc: Black },
-    { name: 'Premium', imgSrc: Premium },
-    { name: 'Fruit', imgSrc: Fruit }
+    { name: 'Green', src: Green },
+    { name: 'Black', src: Black },
+    { name: 'Premium', src: Premium },
+    { name: 'Fruit', src: Fruit }
 ];
 
 export const syrupList = [
-    { name: 'None', imgSrc: None },
-    { name: 'Strawberry', imgSrc: Strawberry },
-    { name: 'Raspberry', imgSrc: Raspberry },
-    { name: 'Vanilla', imgSrc: Vanilla }
+    { name: 'None', src: None },
+    { name: 'Strawberry', src: Strawberry },
+    { name: 'Raspberry', src: Raspberry },
+    { name: 'Vanilla', src: Vanilla }
 ];
 
 export const addOnList = [
-    { name: 'None', imgSrc: None },
-    { name: 'Chocolate Chips', imgSrc: ChocolateChips },
-    { name: 'Cookies', imgSrc: Cookies },
-    { name: 'Whipped Cream', imgSrc: WhippedCream }
+    { name: 'None', src: None },
+    { name: 'Chocolate Chips', src: ChocolateChips },
+    { name: 'Cookies', src: Cookies },
+    { name: 'Whipped Cream', src: WhippedCream }
 ];
