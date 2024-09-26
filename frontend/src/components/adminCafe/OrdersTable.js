@@ -94,7 +94,12 @@ export const OrdersTable = () => {
             handlePrompt();
         }
     }, [authorize]);
-    
+
+    const handleClearHistory = () => {
+        fetchData(`${API_URI}/order/clear`, "POST", auth)
+            .then(data => setOrders(data.orders))
+            .catch(console.error);
+    }
 
     return (
         <>
@@ -111,11 +116,11 @@ export const OrdersTable = () => {
                     </div>
                     : <OrderTablesWithTabs
                         orders={orders}
-                        updateOrders={setOrders}
                         completeOrder={handleComplete}
                         statusCafe={isOpenCafe}
                         toggleCafe={handleClose}
-                        auth={auth}/> 
+                        clearHistory={handleClearHistory}
+                    /> 
                 }
             </div>
         </>
