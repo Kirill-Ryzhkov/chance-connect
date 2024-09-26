@@ -1,5 +1,4 @@
 const Event = require("../models/Event");
-const Order = require("../models/Order");
 
 const createEvent = async (req, res) => {
     const { name } = req.body;
@@ -17,7 +16,6 @@ const toggleCafeEvent = async (req, res) => {
      
     try {
         const event = await Event.findOne({name});
-        await Order.deleteMany({complete:true});
 
         if (event) {
             event.open = !event.open;
