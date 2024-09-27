@@ -4,6 +4,7 @@ import "../../assets/css/body.css";
 
 export const OrderTablesWithTabs = ({ orders, completeOrder, statusCafe, toggleCafe, clearHistory }) => {
   const [activeTab, setActiveTab] = useState(0);
+  const [completedId, setCompletedId] = useState([]);
 
   const orders1 = orders.filter(order => !order.complete);
   const orders2 = orders.filter(order => order.complete).reverse();
@@ -11,6 +12,12 @@ export const OrderTablesWithTabs = ({ orders, completeOrder, statusCafe, toggleC
   const handleTabClick = (index) => {
     setActiveTab(index);
   };
+
+  const handleButtonComplete = (order) => {
+    const newArray = [...completedId, order._id];
+    setCompletedId(newArray);
+    completeOrder(order._id);
+  }
 
   return (
     <div className="table-container">
@@ -62,7 +69,12 @@ export const OrderTablesWithTabs = ({ orders, completeOrder, statusCafe, toggleC
                   <td>{order.name}</td>
                   <td>{order.id_number}</td>
                   <td>
-                    <button onClick={() => completeOrder(order._id)}>Complete Order</button>
+                    <button 
+                      onClick={() => handleButtonComplete(order)} 
+                      disabled={completedId.includes(order._id)}
+                    >
+                        Complete Order
+                    </button>
                   </td>
                   
                 </tr>
