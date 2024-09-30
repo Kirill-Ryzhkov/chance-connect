@@ -4,8 +4,7 @@ import { SummaryOrder } from "./SummaryOrder";
 import { CafeGrid } from "./CafeGrid";
 import RedirectButton from "../common/RedirectButton";
 import { coffeeOrTea, coffeeList, teaList, syrupList, addOnList } from "../../assets/cafeList";
-
-const API_URI = process.env.REACT_APP_BACKEND_API_URI;
+import { useCreateOrderMutation } from "../../services/apiSlice";
 
 const CafeMenu = ({ user, updateBalance, auth }) =>  {
     const [step, setStep] = useState(1);
@@ -18,10 +17,13 @@ const CafeMenu = ({ user, updateBalance, auth }) =>  {
 
     const navigate = useNavigate();
 
+    //  RTK Query хук для создания заказа
+    const [createOrder] = useCreateOrderMutation();
+
     const handleDrinkType = (type) => {
         setDrinkType(type);
         setStep(2);
-    }
+    };
 
     const handleDrinkSelect = (drink) => {
         setSelectedDrink(drink);
@@ -55,15 +57,10 @@ const CafeMenu = ({ user, updateBalance, auth }) =>  {
         };
         updateBalance(updatedUser);
         setUpdatedBalance(true);
-    }
+    };
 
-    const handleFinish = () => {
+    const handleFinish = async () => {
         setStep(step + 1);
-        const url = `${API_URI}/order`;
-        const header = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + auth
-        };
 
         let orderName;
         if (drinkType === 'tea') {
@@ -72,25 +69,21 @@ const CafeMenu = ({ user, updateBalance, auth }) =>  {
             orderName = `${drinkType}, ${selectedDrink}, ${syrup}, ${addOn}`;
         }
 
-        const body = {
+        const orderData = {
             name: orderName
         };
 
-        fetch(url, {
-            method: "POST",
-            headers: header,
-            body: JSON.stringify(body)
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                setOrder(data.result);
+        try {
+            const response = await createOrder(orderData).unwrap(); // запрос через RTK Query
+            setOrder(response.result);
 
-                navigate("/done", {
-                    state: { order: data }
-                });
-            })
-            .catch((error) => console.error("Error:", error));
-    }
+            navigate("/done", {
+                state: { order: response }
+            });
+        } catch (error) {
+            console.error("Error:", error); // Обрабатываем ошибку
+        }
+    };
 
     return (
         <>
@@ -157,7 +150,7 @@ const CafeMenu = ({ user, updateBalance, auth }) =>  {
                 />
             </div>
         </>
-    )
+    );
 }
 
 export default CafeMenu;

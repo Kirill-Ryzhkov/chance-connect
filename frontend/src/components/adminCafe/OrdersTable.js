@@ -1,128 +1,103 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { useCookies } from 'react-cookie';
 import Header from "../header/Header";
 import { OrderTablesWithTabs } from "./OrderTablesWithTabs";
 import Button from "../common/Button";
+import { useFetchOrdersQuery, useToggleCafeMutation, useClearOrderHistoryMutation, useFetchCafeStatusQuery, useCompleteOrderMutation, useSignInMutation } from '../../services/apiSlice';
+import { useDispatch } from 'react-redux'; 
+import { setCredentials } from '../../services/authSlice'; // для установки токена при авторизации
 
-const API_URI = process.env.REACT_APP_BACKEND_API_URI;
 const ADMIN_LOGIN = process.env.REACT_APP_ADMIN_USER_LOGIN;
 const ADMIN_PASSWORD = process.env.REACT_APP_ADMIN_USER_PASSWORD;
-const EVENT_NAME = process.env.REACT_APP_EVENT_NAME;
 
 export const OrdersTable = () => {
-
-    const [auth, setAuth] = useState('');
-    const [orders, setOrders] = useState([]);
-    const [cookie, setCookie] = useCookies(['authToken']);
-    const [isOpenCafe, setIsOpenCafe] = useState();
-
-    const fetchData = useCallback(async (url, method = "GET", token = "", body = null) => {
-        const headers = {
-            "Content-Type": "application/json",
-            ...(token && { "Authorization": `Bearer ${token}` })
-        };
-
-        const options = { method, headers };
-        if (body) options.body = JSON.stringify(body);
-
-        const response = await fetch(url, options);
-        return response.json();
-    }, []);
+  const [auth, setAuth] = useState('');
+  const [cookie, setCookie] = useCookies(['authToken']);
+  const [isOpenCafe, setIsOpenCafe] = useState();
 
 
-    useEffect(() => {
-        if (cookie.authToken) {
-            setAuth(cookie.authToken);
-            orderList(cookie.authToken);
-        }
-    }, [cookie.authToken]);
+  // Запрос для получения заказов через RTK Query
+  const { data: ordersData, refetch: refetchOrders } = useFetchOrdersQuery();
+  // Запрос для получения статуса кафе
+  const { data: cafeStatusData, refetch: refetchCafeStatus } = useFetchCafeStatusQuery();
+  const [toggleCafe] = useToggleCafeMutation();
+  const [clearHistory] = useClearOrderHistoryMutation();
+  const [completeOrder] = useCompleteOrderMutation();
+  const [signIn] = useSignInMutation();
 
-    useEffect(() => {
-        if (!auth) return;
+  const dispatch = useDispatch(); 
 
-        const intervalId = setInterval(() => {
-            orderList(auth);
-        }, 10000);
-
-        return () => clearInterval(intervalId);
-    }, [auth]);
-
-    useEffect(() => {
-        fetchData(`${API_URI}/event/statusCafe/${EVENT_NAME}`)
-            .then(data => setIsOpenCafe(data.status.open))
-            .catch(console.error);
-    }, [fetchData]);
-
-    const orderList = useCallback((token) => {
-        fetchData(`${API_URI}/order`, "GET", token)
-            .then(data => setOrders(data.orders))
-            .catch(console.error);
-    }, [fetchData]);
-
-    const handleClose = useCallback(() => {
-        fetchData(`${API_URI}/event/toggleCafe/${EVENT_NAME}`, "GET", auth)
-            .then(() => setIsOpenCafe(!isOpenCafe))
-            .catch(console.error);
-    }, [auth, isOpenCafe, fetchData]);
-
-    const handleComplete = useCallback((id) => {
-        fetchData(`${API_URI}/order/complete`, "POST", auth, { order_id: id })
-            .then(data => setOrders(data.orders))
-            .catch(console.error);
-    }, [auth, fetchData]);
-
-    const authorize = useCallback(() => {
-        if (!auth) {
-            fetchData(`${API_URI}/user/signin`, "POST", "", {
-                email: ADMIN_LOGIN,
-                password: ADMIN_PASSWORD
-            })
-            .then(data => {
-                setCookie('authToken', data.token, { path: '/', expires: new Date(Date.now() + 3600000) });
-                setAuth(data.token);
-                orderList(data.token);
-            })
-            .catch(console.error);
-        }
-    }, [auth, fetchData, setCookie]);
-
-    const handlePrompt = useCallback(() => {
-        const password = window.prompt('Please enter the password:', '');
-        if (password === ADMIN_PASSWORD) {
-            authorize();
-        } else if (password !== null) {
-            handlePrompt();
-        }
-    }, [authorize]);
-
-    const handleClearHistory = () => {
-        fetchData(`${API_URI}/order/clear`, "POST", auth)
-            .then(data => setOrders(data.orders))
-            .catch(console.error);
+  useEffect(() => {
+    if (cookie.authToken) {
+      setAuth(cookie.authToken);
+      dispatch(setCredentials({ token: cookie.authToken })); // Устанавливаем токен в Redux
     }
+  }, [cookie.authToken, dispatch]);
 
-    return (
-        <>
-            <div className="header">
-                <Header />
-            </div>
-            <div className="orders-table">
-                {!auth 
-                    ? 
-                    <div className="w-full text-center">
-                        <Button 
-                            handleClick={handlePrompt}
-                            text={"Get Orders"} />
-                    </div>
-                    : <OrderTablesWithTabs
-                        orders={orders}
-                        completeOrder={handleComplete}
-                        statusCafe={isOpenCafe}
-                        toggleCafe={handleClose}
-                        clearHistory={handleClearHistory}
-                    /> 
-                }
-            </div>
-        </>
-    )
-}
+  useEffect(() => {
+    if (auth) {
+      const intervalId = setInterval(() => {
+        refetchOrders();
+      }, 10000);
+      return () => clearInterval(intervalId);
+    }
+  }, [auth, refetchOrders]);
+
+  useEffect(() => {
+    if (cafeStatusData) {
+      setIsOpenCafe(cafeStatusData.status.open);
+    }
+  }, [cafeStatusData]);
+
+  const handleSignIn = async () => {
+    if (!auth) {
+      const response = await signIn({
+        email: ADMIN_LOGIN, 
+        password: ADMIN_PASSWORD,
+      });
+      if (response.data) {
+        setCookie('authToken', response.data.token, { path: '/', expires: new Date(Date.now() + 3600000) });
+        setAuth(response.data.token); 
+        dispatch(setCredentials({ token: response.data.token })); //  токен в Redux
+      }
+    }
+  };
+
+  const handleClose = async () => {
+    await toggleCafe();
+    refetchCafeStatus();
+  };
+
+  const handleComplete = async (id) => {
+    await completeOrder(id);
+    refetchOrders();
+  };
+
+  const handleClearHistory = async () => {
+    await clearHistory();
+    refetchOrders();
+  };
+
+  return (
+    <>
+      <div className="header">
+        <Header />
+      </div>
+      <div className="orders-table">
+        {!auth ? (
+          <div className="w-full text-center">
+            <Button handleClick={handleSignIn} text={"Sign In"} /> {/* Кнопка для авторизации */}
+          </div>
+        ) : (
+          <OrderTablesWithTabs
+            orders={ordersData ? ordersData.orders : []}
+            completeOrder={handleComplete}
+            statusCafe={isOpenCafe}
+            toggleCafe={handleClose} // Метод открытия/закрытия кафе
+            clearHistory={handleClearHistory}
+          />
+        )}
+      </div>
+    </>
+  );
+};

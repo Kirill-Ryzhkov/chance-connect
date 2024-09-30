@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import Button from "../common/Button";
 
 export const CafeGrid = ({ options, onTileClick,  title = "", handleBack = ""}) => {

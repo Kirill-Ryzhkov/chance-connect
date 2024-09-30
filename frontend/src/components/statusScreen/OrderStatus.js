@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Header from "../header/Header";
-
-const API_URI = process.env.REACT_APP_BACKEND_API_URI;
+import { useFetchOrdersStatusQuery } from "../../services/apiSlice"; 
 
 export const OrderStatus = () => {
-    const [idNumbersCompleted, setIdNumbersCompleted] = useState([]);
-    const [idNumbersNotCompleted, setIdNumbersNotCompleted] = useState([]);
+    const [idNumbersCompleted, setIdNumbersCompleted] = useState([]); 
+    const [idNumbersNotCompleted, setIdNumbersNotCompleted] = useState([]); 
     const [isShowingOrder, setIsShowingOrder] = useState(false);
     const [showingOrders, setShowingOrders] = useState([]);
+
+    const { data, error, isLoading, refetch } = useFetchOrdersStatusQuery();
 
     const showDialog = (commonElements) => {
         if (commonElements.length > 0) {
@@ -18,43 +19,34 @@ export const OrderStatus = () => {
             }, 5000);
         }
     }
-    
 
     useEffect(() => {
-        const fetchCafeStatus = () => {
-            const url = `${API_URI}/order/`;
-            const header = {
-                "Content-Type": "application/json"
-            };
+        if (data) {
+            const newCompletedOrders = data.orders.filter(order => order.complete).reverse();
+            const newCompletedIdNumbers = newCompletedOrders.map(order => order.id_number);
 
-            fetch(url, {
-                method: "GET",
-                headers: header
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                const newCompletedOrders = data.orders.filter(order => order.complete).reverse();
-                const newCompletedIdNumbers = newCompletedOrders.map(order => order.id_number);
-            
-                setIdNumbersNotCompleted(prevNotCompletedIdNumbers => {
+            setIdNumbersNotCompleted(prevNotCompletedIdNumbers => {
+                const commonElements = newCompletedIdNumbers.filter((element) => 
+                    prevNotCompletedIdNumbers.includes(element)
+                );
+                showDialog(commonElements);
 
-                    const commonElements = newCompletedIdNumbers.filter((element) => 
-                        prevNotCompletedIdNumbers.includes(element));
+                return data.orders.filter(order => !order.complete).map(order => order.id_number);
+            });
 
-                    showDialog(commonElements);
-            
-                    return data.orders.filter(order => !order.complete).map(order => order.id_number);
-                });
-            
-                setIdNumbersCompleted(newCompletedIdNumbers);
-            })
-            .catch((error) => console.error("Error:", error));
-        };
-        fetchCafeStatus();
-        const intervalId = setInterval(fetchCafeStatus, 10000);
-    
+            setIdNumbersCompleted(newCompletedIdNumbers);
+        }
+    }, [data]);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            refetch(); 
+        }, 10000);
         return () => clearInterval(intervalId);
-    }, []);
+    }, [refetch]);
+
+    if (isLoading) return <p>Loading...</p>; 
+    if (error) return <p>Error fetching data</p>;
 
     return (
         <>
@@ -89,6 +81,5 @@ export const OrderStatus = () => {
                 </div>
             )}
         </>
-    )
-
+    );
 }

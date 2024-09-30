@@ -4,52 +4,44 @@ import Header from "../header/Header";
 import { ShowNumber } from "./ShowNumber";
 import { Payment } from "./payment/Payment";
 import { HomeRedirect } from "./HomeRedirect";
-
-const API_URI = process.env.REACT_APP_BACKEND_API_URI;
+import { useProcessPaymentMutation } from "../../services/apiSlice"; 
 
 export const FinalScreen = () => {
     const location = useLocation();
     const { order } = location.state ?? "";
 
-    const [newOrder, setNewOrder] = useState("");
+    const [newOrder, setNewOrder] = useState(""); 
     const [error, setError] = useState("");
 
     const [queryParams] = useSearchParams();
-    
+
+    // хук RTK Query для обработки платежа
+    const [processPayment] = useProcessPaymentMutation();
 
     useEffect(() => {
         const paymentIntent = queryParams.get('payment_intent');
 
-        if(paymentIntent){
-            const url = `${API_URI}/order/payment`;
-            const header = {
-                "Content-Type": "application/json"
-            };
-            const body = {
+        if (paymentIntent) {
+            const paymentData = {
                 intent_id: paymentIntent
             };
 
-            fetch(url, {
-                method: "POST",
-                headers: header,
-                body: JSON.stringify(body)
-            })
-                .then((response) => response.json())
+            processPayment(paymentData)
+                .unwrap()
                 .then((data) => {
-                    if(data.success) {
-                        setNewOrder(data.result);
+                    if (data.success) {
+                        setNewOrder(data.result); 
                     } else {
-                        setError("Payment Failed");
+                        setError("Payment Failed"); 
                     }
-                    
                 })
                 .catch((error) => {
                     setError("Payment Failed");
                     console.error("Error:", error);
                 });
         }
-    }, []);
-    
+    }, [queryParams, processPayment]); 
+
 
     return (
         <>
